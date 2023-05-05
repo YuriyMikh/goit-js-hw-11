@@ -15,7 +15,9 @@ function onSearch(event) {
   console.log(searchQuery);
 }
 
-function renderMarkupGallery() {}
+function renderMarkupGallery() {
+  //тело функции
+}
 
 // Шаблон разметки карточки одного изображения для галереи:
 // <div class="photo-card">
