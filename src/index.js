@@ -10,13 +10,14 @@ const galleryRef = document.querySelector('.gallery');
 formRef.addEventListener('submit', onSearch);
 
 function onSearch(event) {
-    event.preventDefault();
-    const searchQuery = event.currentTarget.elements.searchQuery.value;
+  event.preventDefault();
+  const searchQuery = event.currentTarget.elements.searchQuery.value;
   console.log(searchQuery);
 }
 
 function renderMarkupGallery() {
-  //тело функции
+  //прописать логику
+  //добаить данные
 }
 
 // Шаблон разметки карточки одного изображения для галереи:
