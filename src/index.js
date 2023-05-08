@@ -6,6 +6,8 @@ import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
+const BASE_URL = 'https://pixabay.com/api/';
+const keyPixabay = '36139966-d8e0729651e76793d90192565';
 
 formRef.addEventListener('submit', onSearch);
 
@@ -13,29 +15,51 @@ function onSearch(event) {
   event.preventDefault();
   const searchQuery = event.currentTarget.elements.searchQuery.value;
   console.log(searchQuery);
+  axios({
+    url: `${BASE_URL}`,
+    params: {
+      key: `${keyPixabay}`,
+      q: `${searchQuery}`,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: 'true',
+    },
+  })
+    .then(function (response) {
+      console.log(response);
+      if (response.data.hits.length === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else {
+        console.log(response);
+        galleryRef.innerHTML = response.data.hits
+          .map(
+            element =>
+              `
+    <div class="photo-card">
+  <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
+  <div class="info">
+    <p class="info-item">
+      <b>${element.likes}</b>
+    </p>
+    <p class="info-item">
+      <b>${element.views}</b>
+    </p>
+    <p class="info-item">
+      <b>${element.comments}</b>
+    </p>
+    <p class="info-item">
+      <b>${element.downloads}</b>
+    </p>
+  </div>
+</div>
+    `
+          )
+          .join('');
+      }
+    })
+    .catch(function (error) {
+       {}
+    });
 }
-
-function renderMarkupGallery() {
-  //прописать логику
-  //добаить данные
-  //тело функции
-}
-
-// Шаблон разметки карточки одного изображения для галереи:
-// <div class="photo-card">
-//   <img src="" alt="" loading="lazy" />
-//   <div class="info">
-//     <p class="info-item">
-//       <b>Likes</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Views</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Comments</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Downloads</b>
-//     </p>
-//   </div>
-// </div>;
