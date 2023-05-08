@@ -7,8 +7,11 @@ import Notiflix from 'notiflix';
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
 const loadMoreButtonRef = document.querySelector('.load-more');
+
 const BASE_URL = 'https://pixabay.com/api/';
 const keyPixabay = '36139966-d8e0729651e76793d90192565';
+
+loadMoreButtonRef.classList.add('is-hidden');
 
 formRef.addEventListener('submit', onSearch);
 
@@ -40,9 +43,10 @@ function onSearch(event) {
           .map(
             element =>
               `
-    <div class="photo-card">
-  <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
-  <div class="info">
+    <a href="${element.largeImageURL}">
+      <div class="photo-card">
+        <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
+        <div class="info">
     <p class="info-item">
       <b>Likes${element.likes}</b>
     </p>
@@ -57,9 +61,11 @@ function onSearch(event) {
     </p>
   </div>
 </div>
+</a>
     `
           )
           .join('');
+        loadMoreButtonRef.classList.remove('is-hidden');
       }
     })
     .catch(function (error) {

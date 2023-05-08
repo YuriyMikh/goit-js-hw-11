@@ -33,3 +33,7 @@ img {
   margin: 0 auto;
   padding: 2px;
 }
+
+.is-hidden{
+display: none;
+}
