@@ -6,6 +6,7 @@ import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
+const loadMoreButtonRef = document.querySelector('.load-more');
 const BASE_URL = 'https://pixabay.com/api/';
 const keyPixabay = '36139966-d8e0729651e76793d90192565';
 
@@ -23,6 +24,8 @@ function onSearch(event) {
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: 'true',
+      page: '1',
+      per_page: '40',
     },
   })
     .then(function (response) {
@@ -41,16 +44,16 @@ function onSearch(event) {
   <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
   <div class="info">
     <p class="info-item">
-      <b>${element.likes}</b>
+      <b>Likes${element.likes}</b>
     </p>
     <p class="info-item">
-      <b>${element.views}</b>
+      <b>Views${element.views}</b>
     </p>
     <p class="info-item">
-      <b>${element.comments}</b>
+      <b>Comments${element.comments}</b>
     </p>
     <p class="info-item">
-      <b>${element.downloads}</b>
+      <b>Downloads${element.downloads}</b>
     </p>
   </div>
 </div>
@@ -60,6 +63,7 @@ function onSearch(event) {
       }
     })
     .catch(function (error) {
-       {}
+      {
+      }
     });
 }
