@@ -6,25 +6,39 @@ const keyPixabay = '36139966-d8e0729651e76793d90192565';
 export default class PixabayApiService {
   constructor() {
     this.searchQuery = ''; //сюда будем сохранять то, что ввел пользователь при сабмите формы (через геттер и сеттер)
+    this.page = 1; //здесь будем хранить текущее значение страницы (и в будущем добалять +1 для пагинации)
   }
 
+  //функция, которая будет делать запросы на сервер используя библиотеку axios. Из этой функции возвращается результат fetchData(), то есть промис
   fetchData() {
-    console.log(this);
-    axios({
+    console.log(this); //можем посмотреть что будет приходить в this
+    return axios({
       url: BASE_URL,
       params: {
         key: keyPixabay,
-        q: this.searchQuery, //при запросах в это свойство передаем начение searchQuery (то, что ищет пользователь)
+        q: this.searchQuery, //при запросах в это свойство передаем значение searchQuery (то, что ищет пользователь)
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: 'true',
-        page: '1',
-        per_page: '40',
+        page: this.page, //в этот параметр будет приходить номер странички
+        per_page: '3',
       },
-    }).then(function (response) {
-      console.log(response);
+    }).then(({ data }) => {
+      this.incrementPage(); // делаем вызов метода, который добавляет одну страничку для пагинации
+      console.log(data);
+      return data; //в data - значение промиса (в данном случае массив с фотографиями, которые возвращает pixabay.com/api/). Теперь в файле index.js при вызове pixabayApiService.fetchData() можно будет прицепить .then() для обработки результатов (например, рисования разметки)
     });
   }
+
+  incrementPage() {
+    this.page += 1;
+  }
+
+  //метод для сброса номера страницы до 1
+  resetPage() {
+    this.page = 1;
+  }
+
   //для того, чтобы из внешнего кода записать значение searchQuery создаем геттер и сеттер
   get query() {
     return this.searchQuery;

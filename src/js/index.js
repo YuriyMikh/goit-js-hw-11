@@ -17,15 +17,63 @@ loadMoreButtonRef.addEventListener('click', onLoadMore);
 
 function onSearch(event) {
   event.preventDefault();
-  pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //в свойство searchQuery через геттер и сеттер в файл api-pixabay.js записываем термин поиска
-  pixabayApiService.fetchData(); //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js
+
+  pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
+
+  //проверка 
+  pixabayApiService.fetchData().then(({ hits, total }) => {
+    if (hits.length === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+  });
+
+    clearGalleryContainer();
+  pixabayApiService.resetPage(); //при сабмите формы сбрасываем термин запрос
+  pixabayApiService.fetchData().then(renderMarkup); //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js
 }
 
 function onLoadMore() {
-  pixabayApiService.fetchData();
+  pixabayApiService.fetchData().then(renderMarkup);
 }
 
-//       .then(function (response) {
+function renderMarkup(photos) {
+  console.log(photos);
+  const markup = photos.hits
+    .map(
+      element => `
+    <a href="${element.largeImageURL}">
+      <div class="photo-card">
+        <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
+        <div class="info">
+    <p class="info-item">
+      <b>Likes${element.likes}</b>
+    </p>
+    <p class="info-item">
+      <b>Views${element.views}</b>
+    </p>
+    <p class="info-item">
+      <b>Comments${element.comments}</b>
+    </p>
+    <p class="info-item">
+      <b>Downloads${element.downloads}</b>
+    </p>
+  </div>
+</div>
+</a>
+    `
+    )
+    .join('');
+  galleryRef.insertAdjacentHTML('beforeend', markup);
+}
+
+//функция для сброса разметки. Будет использоваться при смене термина запроса
+function clearGalleryContainer() {
+  galleryRef.innerHTML = '';
+}
+
+//.then(function (response) {
 //       console.log(response);
 //       if (response.data.hits.length === 0) {
 //         Notiflix.Notify.failure(
