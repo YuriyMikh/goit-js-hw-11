@@ -20,10 +20,10 @@ function onSearch(event) {
   const searchQuery = event.currentTarget.elements.searchQuery.value;
   console.log(searchQuery);
   axios({
-    url: `${BASE_URL}`,
+    url: BASE_URL,
     params: {
-      key: `${keyPixabay}`,
-      q: `${searchQuery}`,
+      key: keyPixabay,
+      q: searchQuery,
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: 'true',
