@@ -1,75 +1,69 @@
-import './styles.css';
+import '../styles.css';
+import PixabayApiService from './api-pixabay.js';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import axios from 'axios';
 import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
 const loadMoreButtonRef = document.querySelector('.load-more');
 
-const BASE_URL = 'https://pixabay.com/api/';
-const keyPixabay = '36139966-d8e0729651e76793d90192565';
+const pixabayApiService = new PixabayApiService(); //на основе класса PixabayApiService из файла api-pixabay.js создаем экземпляр класса (со свойствами и методами)
 
-loadMoreButtonRef.classList.add('is-hidden');
+// loadMoreButtonRef.classList.add('is-hidden');
 
 formRef.addEventListener('submit', onSearch);
+loadMoreButtonRef.addEventListener('click', onLoadMore);
 
 function onSearch(event) {
   event.preventDefault();
-  const searchQuery = event.currentTarget.elements.searchQuery.value;
-  console.log(searchQuery);
-  axios({
-    url: BASE_URL,
-    params: {
-      key: keyPixabay,
-      q: searchQuery,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: 'true',
-      page: '1',
-      per_page: '40',
-    },
-  })
-    .then(function (response) {
-      console.log(response);
-      if (response.data.hits.length === 0) {
-        Notiflix.Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      } else {
-        console.log(response);
-        galleryRef.innerHTML = response.data.hits
-          .map(
-            element =>
-              `
-    <a href="${element.largeImageURL}">
-      <div class="photo-card">
-        <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
-        <div class="info">
-    <p class="info-item">
-      <b>Likes${element.likes}</b>
-    </p>
-    <p class="info-item">
-      <b>Views${element.views}</b>
-    </p>
-    <p class="info-item">
-      <b>Comments${element.comments}</b>
-    </p>
-    <p class="info-item">
-      <b>Downloads${element.downloads}</b>
-    </p>
-  </div>
-</div>
-</a>
-    `
-          )
-          .join('');
-        loadMoreButtonRef.classList.remove('is-hidden');
-      }
-    })
-    .catch(function (error) {
-      {
-      }
-    });
+  pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //в свойство searchQuery через геттер и сеттер в файл api-pixabay.js записываем термин поиска
+  pixabayApiService.fetchData(); //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js
 }
+
+function onLoadMore() {
+  pixabayApiService.fetchData();
+}
+
+//       .then(function (response) {
+//       console.log(response);
+//       if (response.data.hits.length === 0) {
+//         Notiflix.Notify.failure(
+//           'Sorry, there are no images matching your search query. Please try again.'
+//         );
+//       } else {
+//         console.log(response);
+//         galleryRef.innerHTML = response.data.hits
+//           .map(
+//             element =>
+//               `
+//     <a href="${element.largeImageURL}">
+//       <div class="photo-card">
+//         <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
+//         <div class="info">
+//     <p class="info-item">
+//       <b>Likes${element.likes}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Views${element.views}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Comments${element.comments}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Downloads${element.downloads}</b>
+//     </p>
+//   </div>
+// </div>
+// </a>
+//     `
+//           )
+//           .join('');
+//         loadMoreButtonRef.classList.remove('is-hidden');
+//       }
+//     })
+//     .catch(function (error) {
+//       {
+//       }
+//     });
+// }
