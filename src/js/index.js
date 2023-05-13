@@ -24,6 +24,7 @@ function onSearch(event) {
 
   pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
   pixabayApiService.resetPage(); //при сабмите формы сбрасываем странички до единицы
+  loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку, а ниже по коду fetchData() обработает поведение этой кнопки
 
   //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js, цепляем .then() и обрабатываем полученные данные
   pixabayApiService.fetchData().then(data => {
