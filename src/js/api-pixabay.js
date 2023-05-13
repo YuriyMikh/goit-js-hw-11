@@ -22,10 +22,10 @@ export default class PixabayApiService {
         orientation: 'horizontal',
         safesearch: 'true',
         page: this.page, //в этот параметр будет приходить номер странички
-        per_page: 40,
+        per_page: this.per_page,
       },
     }).then(({ data }) => {
-      this.incrementPage(); // делаем вызов метода, который добавляет одну страничку для пагинации
+      this.incrementPage(); //делаем вызов метода, который добавляет одну страничку для пагинации
       console.log(this);
       console.log(data);
       return data; //в data - значение промиса, которые возвращает pixabay.com/api/. Теперь в файле index.js при вызове pixabayApiService.fetchData() можно будет прицепить .then() для обработки результатов (например, рисования разметки). В данном случае в промисе объект с тремя ключами (total - общее кол-во найденных фото в базе данных, totalHits - количество доступных фото в моей бесплатной версии доступа к Pixabay, hits - массив с объектами фотографий).
