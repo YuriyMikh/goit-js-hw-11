@@ -31,6 +31,7 @@ function onSearch(event) {
     //проверка, если вернулся пустой массив - выводим сообщение о сбое
     if (data.hits.length === 0) {
       notificationFailure();
+      clearGalleryContainer();
       return;
     } else {
       notificationSuccess(data.totalHits);
@@ -133,4 +134,3 @@ function notificationEndSearch() {
     `We're sorry, but you've reached the end of search results.`
   );
 }
-
