@@ -30,44 +30,55 @@ function onSearch(event) {
     //проверка, если вернулся пустой массив - выводим сообщение о сбое
     if (data.hits.length === 0) {
       notificationFailure();
-      clearGalleryContainer();
+      return;
+    } else {
+      notificationSuccess(data.totalHits);
+    }
+    //если текущая страница умноженная на кол-во фоток в странице больше чем общее кол-во фоток, которое вернулось с сервера выводим нотификацию об окончании поиска и прячем кнопку 'Load more'
+    if (pixabayApiService.page * pixabayApiService.per_page > data.totalHits) {
+      notificationEndSearch();
+      loadMoreButtonRef.classList.add('is-hidden');
+    } else {
+      loadMoreButtonRef.classList.remove('is-hidden');
     }
 
-    notificationSuccess(data.totalHits);
     clearGalleryContainer();
     renderMarkup(data);
-    loadMoreButtonRef.classList.remove('is-hidden');
     console.log(data.totalHits);
   });
-  // clearGalleryContainer();
-  // pixabayApiService.resetPage(); //при сабмите формы сбрасываем странички до единицы
-  // pixabayApiService.fetchData().then(renderMarkup); //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js
 }
 
 function onLoadMore() {
   pixabayApiService
     .fetchData()
     .then(data => {
-      //проверку переписать!
-      if (!pixabayApiService.hasMorePhotos()) {
-        Notiflix.Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
+      if (
+        pixabayApiService.page * pixabayApiService.per_page >
+        data.totalHits
+      ) {
+        notificationEndSearch();
+        loadMoreButtonRef.classList.add('is-hidden');
       } else {
         renderMarkup(data);
       }
+      console.log(pixabayApiService.page);
+      console.log(pixabayApiService.per_page);
+      console.log(pixabayApiService.page * pixabayApiService.per_page);
+      console.log(data.totalHits);
     })
     //что вообще пишем в .catch()?
     .catch(data => {
       console.log(data);
-      if (data.response.status === 400) {
-        Notiflix.Notify.failure(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
+      //в if ниже свойство status не может быть прочитано из undefined
+      // if (data.response.status === 400) {
+      //   Notiflix.Notify.failure(
+      //     "We're sorry, but you've reached the end of search results."
+      //   );
+      // }
     });
 }
 
+//рендерим разметку
 function renderMarkup(data) {
   console.log(data);
   const markup = data.hits
@@ -110,49 +121,15 @@ function notificationFailure() {
   );
 }
 
+//функция для вывода уведомления о кол-ве найденых фоток
 function notificationSuccess(total) {
   Notiflix.Notify.success(`Hooray! We found ${total} images.`);
 }
 
-//.then(function (response) {
-//       console.log(response);
-//       if (response.data.hits.length === 0) {
-//         Notiflix.Notify.failure(
-//           'Sorry, there are no images matching your search query. Please try again.'
-//         );
-//       } else {
-//         console.log(response);
-//         galleryRef.innerHTML = response.data.hits
-//           .map(
-//             element =>
-//               `
-//     <a href="${element.largeImageURL}">
-//       <div class="photo-card">
-//         <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
-//         <div class="info">
-//     <p class="info-item">
-//       <b>Likes${element.likes}</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Views${element.views}</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Comments${element.comments}</b>
-//     </p>
-//     <p class="info-item">
-//       <b>Downloads${element.downloads}</b>
-//     </p>
-//   </div>
-// </div>
-// </a>
-//     `
-//           )
-//           .join('');
-//         loadMoreButtonRef.classList.remove('is-hidden');
-//       }
-//     })
-//     .catch(function (error) {
-//       {
-//       }
-//     });
-// }
+//функция для вывода уведомления об окончании рендера фоток, т.к. больше фотографий не найдено
+function notificationEndSearch() {
+  Notiflix.Notify.info(
+    `We're sorry, but you've reached the end of search results.`
+  );
+}
+

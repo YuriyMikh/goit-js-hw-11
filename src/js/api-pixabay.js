@@ -7,11 +7,12 @@ export default class PixabayApiService {
   constructor() {
     this.searchQuery = ''; //сюда будем сохранять то, что ввел пользователь при сабмите формы (через геттер и сеттер)
     this.page = 1; //здесь будем хранить текущее значение страницы (и в будущем добалять +1 для пагинации)
+    this.per_page = 40; //сколько будем рендерить фоток в каждом ответе с сервера
   }
 
   //функция, которая будет делать запросы на сервер используя библиотеку axios. Из этой функции возвращается результат (промис), который будем обрабатывать в файле index.js
   fetchData() {
-    console.log(this); //можем посмотреть что будет приходить в this
+    console.log(this); //смотрим что будет приходить в this
     return axios({
       url: BASE_URL,
       params: {
@@ -21,7 +22,7 @@ export default class PixabayApiService {
         orientation: 'horizontal',
         safesearch: 'true',
         page: this.page, //в этот параметр будет приходить номер странички
-        per_page: '40',
+        per_page: 40,
       },
     }).then(({ data }) => {
       this.incrementPage(); // делаем вызов метода, который добавляет одну страничку для пагинации
@@ -40,7 +41,7 @@ export default class PixabayApiService {
     this.page = 1;
   }
 
-  //для того, чтобы из внешнего кода записать значение searchQuery создаем геттер и сеттер
+  //для того, чтобы из внешнего кода записать значение searchQuery создаем сеттер и на всякий случай геттер
   get query() {
     return this.searchQuery;
   }
