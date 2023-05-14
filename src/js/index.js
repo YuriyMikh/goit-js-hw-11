@@ -3,12 +3,13 @@ import PixabayApiService from './api-pixabay.js';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
+import simpleLightbox from 'simplelightbox';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
 const loadMoreButtonRef = document.querySelector('.load-more');
 
-const modalLightboxGallery = new SimpleLightbox('.gallery a', {
+let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
@@ -46,6 +47,7 @@ function onSearch(event) {
 
     clearGalleryContainer();
     renderMarkup(data);
+    simpleLightboxGallery.refresh();
     console.log(data.totalHits);
   });
 }
@@ -62,6 +64,7 @@ function onLoadMore() {
         loadMoreButtonRef.classList.add('is-hidden');
       } else {
         renderMarkup(data);
+        simpleLightboxGallery.refresh();
       }
       console.log(pixabayApiService.page);
       console.log(pixabayApiService.per_page);
