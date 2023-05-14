@@ -3,7 +3,6 @@ import PixabayApiService from './api-pixabay.js';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
-import simpleLightbox from 'simplelightbox';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
