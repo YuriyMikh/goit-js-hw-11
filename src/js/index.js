@@ -12,7 +12,7 @@ let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
-const pixabayApiService = new PixabayApiService(); //на основе класса PixabayApiService из файла api-pixabay.js создаем экземпляр класса (со свойствами и методами)
+const pixabayApiService = new PixabayApiService(); //на основее класса PixabayApiService из файла api-pixabay.js создаем экземпляр класса (со свойствами и методами)
 
 loadMoreButtonRef.classList.add('is-hidden'); //скрываем кнопку "Load more"
 
