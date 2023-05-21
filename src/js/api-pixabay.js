@@ -11,25 +11,25 @@ export default class PixabayApiService {
   }
 
   //функция, которая будет делать запросы на сервер используя библиотеку axios. Из этой функции возвращается результат (промис), который будем обрабатывать в файле index.js
-  fetchData() {
+  async fetchData() {
     console.log(this); //смотрим что будет приходить в this
-    return axios({
-      url: BASE_URL,
-      params: {
-        key: keyPixabay,
-        q: this.searchQuery, //при запросах в это свойство передаем значение searchQuery (то, что ищет пользователь)
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: 'true',
-        page: this.page, //в этот параметр будет приходить номер странички
-        per_page: this.per_page,
-      },
-    }).then(({ data }) => {
-      this.incrementPage(); //делаем вызов метода, который добавляет одну страничку для пагинации
-      console.log(this);
-      console.log(data);
-      return data; //в data - значение промиса, которые возвращает pixabay.com/api/. Теперь в файле index.js при вызове pixabayApiService.fetchData() можно будет прицепить .then() для обработки результатов (например, рисования разметки). В данном случае в промисе объект с тремя ключами (total - общее кол-во найденных фото в базе данных, totalHits - количество доступных фото в моей бесплатной версии доступа к Pixabay, hits - массив с объектами фотографий).
-    });
+
+    const params = {
+      key: keyPixabay,
+      q: this.searchQuery, //при запросах в это свойство передаем значение searchQuery (то, что ищет пользователь)
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      page: this.page, //в этот параметр будет приходить номер странички
+      per_page: this.per_page,
+    };
+
+    this.incrementPage(); //делаем вызов метода, который добавляет одну страничку для пагинации
+    console.log(this);
+    
+    const { data } = await axios.get(BASE_URL, {params});
+    console.log(data);
+    return data; //в data - значение промиса, которые возвращает pixabay.com/api/. Теперь в файле index.js при вызове pixabayApiService.fetchData() можно будет прицепить .then() для обработки результатов (например, рисования разметки). В данном случае в промисе объект с тремя ключами (total - общее кол-во найденных фото в базе данных, totalHits - количество доступных фото в моей бесплатной версии доступа к Pixabay, hits - массив с объектами фотографий).
   }
 
   incrementPage() {

@@ -19,7 +19,7 @@ loadMoreButtonRef.classList.add('is-hidden'); //скрываем кнопку "L
 formRef.addEventListener('submit', onSearch);
 loadMoreButtonRef.addEventListener('click', onLoadMore);
 
-function onSearch(event) {
+async function onSearch(event) {
   event.preventDefault();
 
   pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
@@ -27,7 +27,7 @@ function onSearch(event) {
   loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку, а ниже по коду fetchData() обработает поведение этой кнопки
 
   //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js, цепляем .then() и обрабатываем полученные данные
-  pixabayApiService.fetchData().then(data => {
+  await pixabayApiService.fetchData().then(data => {
     //проверка, если вернулся пустой массив - выводим сообщение о сбое
     if (data.hits.length === 0) {
       notificationFailure();
