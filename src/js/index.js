@@ -51,8 +51,8 @@ async function onSearch(event) {
   });
 }
 
-function onLoadMore() {
-  pixabayApiService
+async function onLoadMore() {
+  await pixabayApiService
     .fetchData()
     .then(data => {
       if (
