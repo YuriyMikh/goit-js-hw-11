@@ -90,7 +90,7 @@ function renderMarkup(data) {
       element => `
   <a href="${element.largeImageURL}">
     <div class="photo-card">
-      <div class="thumb"
+      <div class="thumb">
         <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
       </div>
       <div class="info">
