@@ -88,25 +88,31 @@ function renderMarkup(data) {
   const markup = data.hits
     .map(
       element => `
-    <a href="${element.largeImageURL}">
-      <div class="photo-card">
+  <a href="${element.largeImageURL}">
+    <div class="photo-card">
+      <div class="thumb"
         <img src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
-        <div class="info">
-    <p class="info-item">
-      <b>Likes${element.likes}</b>
-    </p>
-    <p class="info-item">
-      <b>Views${element.views}</b>
-    </p>
-    <p class="info-item">
-      <b>Comments${element.comments}</b>
-    </p>
-    <p class="info-item">
-      <b>Downloads${element.downloads}</b>
-    </p>
-  </div>
-</div>
-</a>
+      </div>
+      <div class="info">
+        <p class="info-item">
+          <b>Likes</b>
+          ${element.likes}
+        </p>
+        <p class="info-item">
+          <b>Views</b>
+          ${element.views}
+        </p>
+        <p class="info-item">
+          <b>Comments</b>
+          ${element.comments}
+        </p>
+        <p class="info-item">
+          <b>Downloads</b>
+          ${element.downloads}
+        </p>
+      </div>
+    </div>
+  </a>
     `
     )
     .join('');
