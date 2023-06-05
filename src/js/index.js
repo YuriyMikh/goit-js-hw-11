@@ -6,6 +6,13 @@ import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
+// const { height: cardHeight } = galleryRef.firstElementChild.getBoundingClientRect();
+
+//   window.scrollBy({
+//     top: cardHeight * 2,
+//     behavior: 'smooth',
+//   });
+
 const loadMoreButtonRef = document.querySelector('.load-more');
 
 let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
@@ -22,33 +29,45 @@ loadMoreButtonRef.addEventListener('click', onLoadMore);
 async function onSearch(event) {
   event.preventDefault();
 
-  pixabayApiService.query = event.currentTarget.elements.searchQuery.value; //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
+  pixabayApiService.query = event.currentTarget.elements.searchQuery.value
+    .toLowerCase()
+    .trim(); //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
   pixabayApiService.resetPage(); //при сабмите формы сбрасываем странички до единицы
-  loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку, а ниже по коду fetchData() обработает поведение этой кнопки
+  loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку 'Load more', а ниже по коду fetchData() обработает поведение этой кнопки
 
   //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js, цепляем .then() и обрабатываем полученные данные
-  await pixabayApiService.fetchData().then(data => {
-    //проверка, если вернулся пустой массив - выводим сообщение о сбое
-    if (data.hits.length === 0) {
-      notificationFailure();
-      clearGalleryContainer();
-      return;
-    } else {
-      notificationSuccess(data.totalHits);
-    }
-    //если текущая страница умноженная на кол-во фоток в странице больше чем общее кол-во фоток, которое вернулось с сервера выводим нотификацию об окончании поиска и прячем кнопку 'Load more'
-    if (pixabayApiService.page * pixabayApiService.per_page > data.totalHits) {
-      notificationEndSearch();
-      loadMoreButtonRef.classList.add('is-hidden');
-    } else {
-      loadMoreButtonRef.classList.remove('is-hidden');
-    }
+  await pixabayApiService
+    .fetchData()
+    .then(data => {
+      //проверка, если вернулся пустой массив - выводим сообщение о сбое
+      if (data.hits.length === 0 || pixabayApiService.query === '') {
+        notificationFailure();
+        clearGalleryContainer();
+        return;
+      } else {
+        notificationSuccess(data.totalHits);
+      }
+      //если текущая страница умноженная на кол-во фоток в странице больше чем общее кол-во фоток, которое вернулось с сервера - выводим нотификацию об окончании поиска и прячем кнопку 'Load more'
+      if (
+        pixabayApiService.page * pixabayApiService.per_page >
+        data.totalHits
+      ) {
+        notificationEndSearch();
+        loadMoreButtonRef.classList.add('is-hidden');
+      } else {
+        loadMoreButtonRef.classList.remove('is-hidden');
+      }
 
-    clearGalleryContainer();
-    renderMarkup(data);
-    simpleLightboxGallery.refresh();
-    console.log(data.totalHits);
-  });
+      clearGalleryContainer();
+      renderMarkup(data);
+      simpleLightboxGallery.refresh();
+      console.log(data.totalHits);
+    })
+    .catch(promise => {
+      Notiflix.Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!'
+      );
+    });
 }
 
 async function onLoadMore() {
@@ -64,6 +83,16 @@ async function onLoadMore() {
       } else {
         renderMarkup(data);
         simpleLightboxGallery.refresh();
+
+        //фича для плавной прокрутки странички вниз после нажатия на 'Load more'
+        const { height: cardHeight } = document
+          .querySelector('.gallery')
+          .firstElementChild.getBoundingClientRect();
+
+        window.scrollBy({
+          top: cardHeight * 2,
+          behavior: 'smooth',
+        });
       }
       console.log(pixabayApiService.page);
       console.log(pixabayApiService.per_page);
@@ -85,6 +114,7 @@ async function onLoadMore() {
 //рендерим разметку
 function renderMarkup(data) {
   console.log(data);
+  // const { } = data;
   const markup = data.hits
     .map(
       element => `

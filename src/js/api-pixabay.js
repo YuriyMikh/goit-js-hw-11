@@ -1,12 +1,12 @@
 import axios from 'axios';
 
 const BASE_URL = 'https://pixabay.com/api/';
-const keyPixabay = '36139966-d8e0729651e76793d90192565';
+const API_KEY = '36139966-d8e0729651e76793d90192565';
 
 export default class PixabayApiService {
   constructor() {
-    this.searchQuery = ''; //сюда будем сохранять то, что ввел пользователь при сабмите формы (через геттер и сеттер)
-    this.page = 1; //здесь будем хранить текущее значение страницы (и в будущем добалять +1 для пагинации)
+    this.searchQuery = ''; //будем хранить то, что ввел пользователь при сабмите формы (сохраняем через геттер и сеттер)
+    this.page = 1; //для хранения текущего значения страницы (и в будущем добалять +1 для пагинации)
     this.per_page = 40; //сколько будем рендерить фоток в каждом ответе с сервера
   }
 
@@ -15,7 +15,7 @@ export default class PixabayApiService {
     console.log(this); //смотрим что будет приходить в this
 
     const params = {
-      key: keyPixabay,
+      key: API_KEY,
       q: this.searchQuery, //при запросах в это свойство передаем значение searchQuery (то, что ищет пользователь)
       image_type: 'photo',
       orientation: 'horizontal',
