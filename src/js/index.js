@@ -6,13 +6,6 @@ import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
-// const { height: cardHeight } = galleryRef.firstElementChild.getBoundingClientRect();
-
-//   window.scrollBy({
-//     top: cardHeight * 2,
-//     behavior: 'smooth',
-//   });
-
 const loadMoreButtonRef = document.querySelector('.load-more');
 
 let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
@@ -29,9 +22,11 @@ loadMoreButtonRef.addEventListener('click', onLoadMore);
 async function onSearch(event) {
   event.preventDefault();
 
+  //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
   pixabayApiService.query = event.currentTarget.elements.searchQuery.value
     .toLowerCase()
-    .trim(); //записываем термин поиска в свойство searchQuery через геттер и сеттер в файл api-pixabay.js
+    .trim();
+
   pixabayApiService.resetPage(); //при сабмите формы сбрасываем странички до единицы
   loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку 'Load more', а ниже по коду fetchData() обработает поведение этой кнопки
 
@@ -39,7 +34,7 @@ async function onSearch(event) {
   await pixabayApiService
     .fetchData()
     .then(data => {
-      //проверка, если вернулся пустой массив - выводим сообщение о сбое
+      //проверка, если вернулся пустой массив или пустая строка - выводим соответствующее сообщение-предупреждение.
       if (data.hits.length === 0 || pixabayApiService.query === '') {
         notificationFailure();
         clearGalleryContainer();
