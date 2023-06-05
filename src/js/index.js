@@ -61,7 +61,6 @@ async function onSearch(event) {
       clearGalleryContainer();
       renderMarkup(data);
       simpleLightboxGallery.refresh();
-      console.log(data.totalHits);
     })
     .catch(promise => {
       Notiflix.Notify.failure(
@@ -94,27 +93,15 @@ async function onLoadMore() {
           behavior: 'smooth',
         });
       }
-      console.log(pixabayApiService.page);
-      console.log(pixabayApiService.per_page);
-      console.log(pixabayApiService.page * pixabayApiService.per_page);
-      console.log(data.totalHits);
     })
     //что вообще пишем в .catch()?
     .catch(data => {
       console.log(data);
-      //в if ниже свойство status не может быть прочитано из undefined
-      // if (data.response.status === 400) {
-      //   Notiflix.Notify.failure(
-      //     "We're sorry, but you've reached the end of search results."
-      //   );
-      // }
     });
 }
 
 //рендерим разметку
 function renderMarkup(data) {
-  console.log(data);
-  // const { } = data;
   const markup = data.hits
     .map(
       element => `
