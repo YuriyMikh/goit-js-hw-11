@@ -43,6 +43,7 @@ async function onSearch(event) {
       notificationSuccess(data.totalHits);
       clearGalleryContainer();
       renderMarkup(data);
+      simpleLightboxGallery.refresh();
     } else {
       clearGalleryContainer();
       notificationSuccess(data.totalHits);
@@ -70,6 +71,7 @@ async function onLoadMore() {
     ) {
       notificationEndSearch();
       renderMarkup(data);
+      simpleLightboxGallery.refresh();
       loadMoreButtonRef.classList.add('is-hidden');
     } else {
       renderMarkup(data);
