@@ -8,13 +8,10 @@ const formRef = document.querySelector('#search-form');
 const galleryRef = document.querySelector('.gallery');
 const loadMoreButtonRef = document.querySelector('.load-more');
 
-let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
-  captionDelay: 250,
-});
+//инициализируем SimpleLightbox
+let simpleLightboxGallery = new SimpleLightbox('.gallery a');
 
 const pixabayApiService = new PixabayApiService(); //на основе класса PixabayApiService из файла api-pixabay.js создаем экземпляр класса (со свойствами и методами)
-
-loadMoreButtonRef.classList.add('is-hidden'); //скрываем кнопку "Load more"
 
 formRef.addEventListener('submit', onSearch);
 loadMoreButtonRef.addEventListener('click', onLoadMore);
@@ -28,71 +25,70 @@ async function onSearch(event) {
     .trim();
 
   pixabayApiService.resetPage(); //при сабмите формы сбрасываем странички до единицы
-  loadMoreButtonRef.classList.add('is-hidden'); //при сабмите формы прячем кнопку 'Load more', а ниже по коду fetchData() обработает поведение этой кнопки
 
-  //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js, цепляем .then() и обрабатываем полученные данные
-  await pixabayApiService
-    .fetchData()
-    .then(data => {
-      //проверка, если вернулся пустой массив или пустая строка - выводим соответствующее сообщение-предупреждение.
-      if (data.hits.length === 0 || pixabayApiService.query === '') {
-        notificationFailure();
-        clearGalleryContainer();
-        return;
-      } else {
-        notificationSuccess(data.totalHits);
-      }
-      //если текущая страница умноженная на кол-во фоток в странице больше чем общее кол-во фоток, которое вернулось с сервера - выводим нотификацию об окончании поиска и прячем кнопку 'Load more'
-      if (
-        pixabayApiService.page * pixabayApiService.per_page >
-        data.totalHits
-      ) {
-        notificationEndSearch();
-        loadMoreButtonRef.classList.add('is-hidden');
-      } else {
-        loadMoreButtonRef.classList.remove('is-hidden');
-      }
+  //на экземпляре класса pixabayApiService вызываем метод fetchData() из файла api-pixabay.js. Обрабатываем данные через async await
+  try {
+    const { data } = await pixabayApiService.fetchData(); //сразу же деструктуризируем data
 
+    //если вернулся пустой массив или пустая строка - выводим соответствующее сообщение-предупреждение.
+    if (data.hits.length === 0 || pixabayApiService.query === '') {
+      notificationFailure();
+      clearGalleryContainer();
+      return;
+    }
+
+    //если вернулось менее 40 фоток (data.hits.length) - просто рендерим разметку и вызываем нотификашку
+    //если более 40 - делаем всё тоже самое, но открываем кнопку "Load more". Обработка ее нажатия ниже по коду
+    if (data.hits.length < pixabayApiService.per_page) {
+      notificationSuccess(data.totalHits);
       clearGalleryContainer();
       renderMarkup(data);
+    } else {
+      clearGalleryContainer();
+      notificationSuccess(data.totalHits);
+      loadMoreButtonRef.classList.remove('is-hidden');
+      renderMarkup(data);
       simpleLightboxGallery.refresh();
-    })
-    .catch(promise => {
-      Notiflix.Notify.failure(
-        'Oops! Something went wrong! Try reloading the page!'
-      );
-    });
+    }
+  } catch (error) {
+    Notiflix.Notify.failure(
+      'Oops! Something went wrong! Try reloading the page!'
+    );
+  }
 }
 
 async function onLoadMore() {
-  await pixabayApiService
-    .fetchData()
-    .then(data => {
-      if (
-        pixabayApiService.page * pixabayApiService.per_page >
-        data.totalHits
-      ) {
-        notificationEndSearch();
-        loadMoreButtonRef.classList.add('is-hidden');
-      } else {
-        renderMarkup(data);
-        simpleLightboxGallery.refresh();
+  const { data } = await pixabayApiService.fetchData();
 
-        //фича для плавной прокрутки странички вниз после нажатия на 'Load more'
-        const { height: cardHeight } = document
-          .querySelector('.gallery')
-          .firstElementChild.getBoundingClientRect();
+  try {
+    //если с сервера пришло больше фоток чем общее кол-во фоток (data.totalHits), - выводим нотификацию об окончании поиска и прячем кнопку "Load more"
+    // так как кол-во page приплюсовывается после каждого нажатия - в конце проверки делаем минус pixabayApiService.per_page
+    if (
+      pixabayApiService.page * pixabayApiService.per_page -
+        pixabayApiService.per_page >
+      data.totalHits
+    ) {
+      notificationEndSearch();
+      renderMarkup(data);
+      loadMoreButtonRef.classList.add('is-hidden');
+    } else {
+      renderMarkup(data);
+      loadMoreButtonRef.classList.remove('is-hidden');
+      simpleLightboxGallery.refresh();
 
-        window.scrollBy({
-          top: cardHeight * 2,
-          behavior: 'smooth',
-        });
-      }
-    })
-    //что вообще пишем в .catch()?
-    .catch(data => {
-      console.log(data);
-    });
+      //фича для плавной прокрутки странички вниз после нажатия на 'Load more'
+      const { height: cardHeight } = document
+        .querySelector('.gallery')
+        .firstElementChild.getBoundingClientRect();
+
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 //рендерим разметку
@@ -100,7 +96,7 @@ function renderMarkup(data) {
   const markup = data.hits
     .map(
       element => `
-  <a href="${element.largeImageURL}">
+  <a href="${element.largeImageURL}" >
     <div class="photo-card">
       <div class="thumb">
         <img class="img" src="${element.webformatURL}" alt="${element.tags}" loading="lazy" />
